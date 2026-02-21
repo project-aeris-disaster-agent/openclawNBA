@@ -1,6 +1,6 @@
 # Daredevil NBA Sports Data (OpenClaw Skill)
 
-NBA sportsdata analytics for OpenClaw x402. Request NBA schedule, scores, boxscore, standings, injuries, roster, and more. Payment per request via x402.
+Request NBA schedule, scores, boxscore, standings, injuries, roster, and more. Payment per request via x402. The agent can also **synthesize** analysis and predictions from this data using your LLM (synthesis runs on your side).
 
 ## What it does
 
@@ -11,16 +11,18 @@ NBA sportsdata analytics for OpenClaw x402. Request NBA schedule, scores, boxsco
 - **Injuries** — Current injury report.
 - **Team roster** — Roster for a team.
 - **Player stats** — Player statistics in context of a game.
+- **Analysis / prediction** — For questions like "What do you think about the LAL and CHI game?", the agent fetches the relevant raw data via x402, then uses the prompt template in the skill to synthesize an answer with your LLM (no LLM on the seller).
 
 ## How to use
 
 1. Install this skill into your OpenClaw workspace (e.g. via ClawHub: `clawhub install daredevil-nba-sportsdata` or copy the skill folder into your workspace `skills/`).
-2. Ask your OpenClaw agent for NBA data, e.g.:
+2. Ask your OpenClaw agent for NBA data or analysis, e.g.:
    - "What's the Lakers schedule this week?"
    - "When is the Celtics' next game?"
    - "NBA standings"
    - "Current injuries"
-3. The agent will use the skill to call the Daredevil API and pay via x402, then return the data.
+   - "What do you think about the Lakers vs Bulls game?" (agent fetches data, then synthesizes with your LLM)
+3. For raw data, the agent calls the Daredevil API and pays via x402, then returns the data. For analysis/prediction, the agent fetches the needed data first, then uses the skill’s synthesis prompt (see `SKILL.md` and `prompts/analyze-game.md`) to produce an answer.
 
 ## Requirements
 

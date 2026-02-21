@@ -5,7 +5,10 @@ description: Request NBA sports data (schedule, boxscore, standings, injuries, r
 
 # Daredevil NBA Sports Data
 
-When the user asks for NBA schedule, scores, boxscore, standings, injuries, team roster, or player stats, use this skill to request data from the Daredevil seller. Each request is paid via x402 (small fee per query).
+Use this skill in two ways:
+
+1. **Raw data** — When the user asks for NBA schedule, scores, boxscore, standings, injuries, team roster, or player stats, request data from the Daredevil seller. Each request is paid via x402 (small fee per query).
+2. **Analysis / prediction** — When the user asks for an opinion, recommendation, or "what do you think?" about a game or matchup (e.g. "What do you think about the LAL and CHI game?"), first retrieve the necessary raw data via this skill, then **synthesize** an answer using your LLM. Synthesis runs on your side (the buyer); the seller only returns raw data.
 
 ## Base URL
 
@@ -66,12 +69,52 @@ Success (200) body shape:
 
 Parse `result` as JSON to get the underlying schedule, boxscore, standings, etc.
 
-## Examples
+## Examples (raw data)
 
 - "What's the Lakers schedule this week?" → `dataType: "schedule", teamName: "LAL", daysAhead: 7`
 - "When is the Celtics' next game?" → `dataType: "next_game", teamName: "BOS"`
 - "NBA standings" → `dataType: "standings"`
 - "Lakers roster" → `dataType: "team_roster", teamName: "LAL"`
 - "Current NBA injuries" → `dataType: "injuries"`
+
+## Analysis and synthesis workflow
+
+When the user asks for an **analysis**, **prediction**, or **opinion** (e.g. "What do you think about the LAL and CHI game?", "Who do you think will win Lakers vs Celtics?", "Should I bet on the Bulls tonight?"):
+
+1. **Determine required data** — For a matchup or game question, typically fetch:
+   - `next_game` for each team (or `schedule` with `teamName` and `daysAhead`) to get game time and matchup.
+   - `standings` for context on team records.
+   - `injuries` for key absences (optional but recommended).
+   - `boxscore` or `live_score` if the game is today and you need current state.
+   - `team_roster` only if roster context is relevant.
+2. **Request that data** — Call `POST /v1/data` (with x402 payment) for each needed `dataType`. Parse each `result` as JSON.
+3. **Synthesize** — Using your LLM, produce a short analysis or prediction based **only** on the retrieved data. Do not invent stats or facts. Use the prompt template below (or see `prompts/analyze-game.md`) with the user's question and the concatenated/summarized retrieved data.
+
+### Synthesis prompt template
+
+After you have the raw data, call your LLM with a prompt like this (fill in the placeholders):
+
+```
+You are an NBA analyst. The user asked: "{{user_question}}"
+
+Below is raw data from the Daredevil NBA API (schedule, boxscore, standings, injuries, etc.). Use only this data to produce a short, clear analysis or prediction. Do not invent facts or stats.
+
+---
+{{retrieved_data}}
+---
+
+Provide your analysis or prediction in a few sentences.
+```
+
+- `{{user_question}}` — The user's exact question (e.g. "What do you think about the LAL and CHI game?").
+- `{{retrieved_data}}` — The JSON or a concise summary of the API responses you received (schedules, standings, injuries, boxscore, etc.). If large, summarize key fields (teams, dates, scores, records, notable injuries) rather than pasting entire payloads.
+
+Then return the LLM's synthesized answer to the user.
+
+### Examples (analysis)
+
+- "What do you think about the LAL and CHI game?" → Fetch `next_game` for LAL and CHI, `standings`, and optionally `injuries`; then run the synthesis prompt with that data.
+- "Who wins Lakers vs Celtics?" → Same: next games / schedule for both, standings, injuries; then synthesize.
+- "Give me a pick for tonight's games" → Fetch `schedule` for today (or `daysAhead: 1`), `standings`, `injuries`; then synthesize picks from the data.
 
 Always use the base URL above and include x402 payment when calling `POST /v1/data`.
