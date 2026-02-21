@@ -1,0 +1,12 @@
+{
+  "name": "Daredevil NBA Sports Data",
+  "tagline": "Query NBA schedule, scores, standings, and more via x402-paid requests.",
+  "description": "This skill lets your OpenClaw agent request NBA sports data (schedule, next game, boxscore, live score, play-by-play, standings, injuries, team roster, player stats) from the Daredevil seller. Each request is paid via x402. Use it when users ask for Lakers schedule, Celtics next game, NBA standings, injuries, or roster data.",
+  "category": "data",
+  "tags": ["nba", "sports", "x402", "data", "schedule", "standings", "boxscore"],
+  "version": "1.0.0",
+  "license": "MIT",
+  "pricing": "paid",
+  "support_url": "https://github.com/project-aeris-disaster-agent/openclawNBA/issues",
+  "homepage": "https://github.com/project-aeris-disaster-agent/openclawNBA"
+}
