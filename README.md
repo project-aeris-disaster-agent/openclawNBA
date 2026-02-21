@@ -1,6 +1,6 @@
 # Daredevil NBA Sports Data (OpenClaw Skill)
 
-Request NBA schedule, scores, boxscore, standings, injuries, roster, and more. Payment per request via x402.
+NBA sportsdata analytics for OpenClaw x402. Request NBA schedule, scores, boxscore, standings, injuries, roster, and more. Payment per request via x402.
 
 ## What it does
 
